@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './routes/product_detail.dart';
 import './routes/product_overview.dart';
 
 void main() {
@@ -14,8 +15,21 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.indigo,
         accentColor: Colors.green[400],
+        textTheme: ThemeData.light().textTheme.copyWith(
+              headline6: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold),
+              headline1: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold),
+            ),
       ),
       home: ProductOverview(),
+      routes: {
+        ProductDetail.routeName: (ctx) => ProductDetail(),
+      },
     );
   }
 }

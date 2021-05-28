@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopapp/models/product.dart';
+import 'package:shopapp/routes/product_detail.dart';
 
 class ProductItem extends StatelessWidget {
   final Product product;
@@ -7,28 +8,42 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridTile(
-      child: Image.network(
-        product.imageUrl,
-        fit: BoxFit.cover,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(
+        10,
       ),
-      footer: GridTileBar(
-        backgroundColor: Colors.black54,
-        leading: IconButton(
-          icon: Icon(Icons.favorite_outline),
-          onPressed: () {},
+      child: GridTile(
+        child: InkWell(
+          splashColor: Theme.of(context).primaryColor,
+          child: Image.network(
+            product.imageUrl,
+            fit: BoxFit.cover,
+          ),
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              ProductDetail.routeName,
+              arguments: product.id,
+            );
+          },
         ),
-        trailing: IconButton(
-          icon: Icon(Icons.shop_outlined),
-          onPressed: () {},
-        ),
-        title: Text(
-          product.title,
-          textAlign: TextAlign.center,
-        ),
-        subtitle: Text(
-          product.price.toString(),
-          textAlign: TextAlign.center,
+        footer: GridTileBar(
+          backgroundColor: Colors.black54,
+          leading: IconButton(
+            icon: Icon(
+              Icons.favorite,
+            ),
+            onPressed: () {},
+          ),
+          trailing: IconButton(
+            icon: Icon(
+              Icons.shopping_cart,
+            ),
+            onPressed: () {},
+          ),
+          title: Text(
+            product.title,
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
