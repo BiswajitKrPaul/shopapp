@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopapp/models/product.dart';
+
 import 'package:shopapp/routes/product_detail.dart';
 
 class ProductItem extends StatelessWidget {
-  final Product product;
-  ProductItem(this.product);
-
   @override
   Widget build(BuildContext context) {
+    final product = Provider.of<Product>(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(
         10,
@@ -30,9 +30,10 @@ class ProductItem extends StatelessWidget {
           backgroundColor: Colors.black54,
           leading: IconButton(
             icon: Icon(
-              Icons.favorite,
-            ),
-            onPressed: () {},
+                product.isFaourite ? Icons.favorite : Icons.favorite_border),
+            onPressed: () {
+              product.setFav();
+            },
           ),
           trailing: IconButton(
             icon: Icon(
