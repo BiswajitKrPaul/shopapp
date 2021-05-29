@@ -4,10 +4,14 @@ import '../providers/product_list_provider.dart';
 import './productItem.dart';
 
 class GridItemBuilder extends StatelessWidget {
+  final bool isFavCheck;
+  GridItemBuilder(this.isFavCheck);
   @override
   Widget build(BuildContext context) {
     final productListObj = Provider.of<ProductList>(context); // provider object
-    final productList = productListObj.productlist;
+    final productList = isFavCheck
+        ? productListObj.favouriteProductList
+        : productListObj.productlist;
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
