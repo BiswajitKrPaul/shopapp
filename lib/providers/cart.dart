@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 
 class CartItem {
@@ -29,6 +27,43 @@ class Cart with ChangeNotifier {
       total = total + value.quantity;
     });
     return total;
+  }
+
+  double get totalAmount {
+    double total = 0.0;
+    _items.forEach((key, value) {
+      total = total + (value.quantity * value.price);
+    });
+    return total;
+  }
+
+  void removeFromCart(String id) {
+    _items.remove(id);
+    notifyListeners();
+  }
+
+  void removeAllFromCart() {
+    _items.clear();
+    notifyListeners();
+  }
+
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    } else if (_items[productId].quantity > 1) {
+      _items.update(
+        productId,
+        (existingValue) => CartItem(
+          id: existingValue.id,
+          price: existingValue.price,
+          quantity: existingValue.quantity - 1,
+          title: existingValue.title,
+        ),
+      );
+    } else {
+      _items.remove(productId);
+    }
+    notifyListeners();
   }
 
   void addToCart(String productid, String productTitle, double productPrice) {
