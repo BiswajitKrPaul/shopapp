@@ -20,13 +20,6 @@ class ProductOverview extends StatefulWidget {
 
 class _ProductOverviewState extends State<ProductOverview> {
   bool isFavCheck = false;
-  bool drawerCheck = false;
-
-  void setDrawer(bool value) {
-    setState(() {
-      drawerCheck = value;
-    });
-  }
 
   Widget myHome(bool isFav) {
     return GridItemBuilder(isFav);
@@ -39,59 +32,57 @@ class _ProductOverviewState extends State<ProductOverview> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MainDrawer(setDrawer),
+      drawer: MainDrawer(),
       appBar: AppBar(
-        title: drawerCheck ? Text('My Orders') : Text('Shop App'),
-        actions: drawerCheck
-            ? []
-            : [
-                Consumer<Cart>(
-                  builder: (ctx, cart, child) => Badge(
-                    badgeColor: Theme.of(context).accentColor,
-                    position: BadgePosition.topEnd(top: 0),
-                    badgeContent: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(cart.totalQuantity.toString()),
-                    ),
-                    animationType: BadgeAnimationType.fade,
-                    showBadge: cart.totalQuantity == 0 ? false : true,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.shopping_cart,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          CartHome.routeName,
-                        );
-                      },
-                    ),
-                  ),
+        title: Text('Shop App'),
+        actions: [
+          Consumer<Cart>(
+            builder: (ctx, cart, child) => Badge(
+              badgeColor: Theme.of(context).accentColor,
+              position: BadgePosition.topEnd(top: 0),
+              badgeContent: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(cart.totalQuantity.toString()),
+              ),
+              animationType: BadgeAnimationType.fade,
+              showBadge: cart.totalQuantity == 0 ? false : true,
+              child: IconButton(
+                icon: Icon(
+                  Icons.shopping_cart,
                 ),
-                PopupMenuButton(
-                  icon: Icon(Icons.more_vert),
-                  onSelected: (FilteredOptions selected) {
-                    setState(() {
-                      if (selected == FilteredOptions.Favourites) {
-                        isFavCheck = true;
-                      } else {
-                        isFavCheck = false;
-                      }
-                    });
-                  },
-                  itemBuilder: (ctx) => [
-                    PopupMenuItem(
-                      child: Text('Only Favorites'),
-                      value: FilteredOptions.Favourites,
-                    ),
-                    PopupMenuItem(
-                      child: Text('All Product'),
-                      value: FilteredOptions.All,
-                    )
-                  ],
-                )
-              ],
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    CartHome.routeName,
+                  );
+                },
+              ),
+            ),
+          ),
+          PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            onSelected: (FilteredOptions selected) {
+              setState(() {
+                if (selected == FilteredOptions.Favourites) {
+                  isFavCheck = true;
+                } else {
+                  isFavCheck = false;
+                }
+              });
+            },
+            itemBuilder: (ctx) => [
+              PopupMenuItem(
+                child: Text('Only Favorites'),
+                value: FilteredOptions.Favourites,
+              ),
+              PopupMenuItem(
+                child: Text('All Product'),
+                value: FilteredOptions.All,
+              )
+            ],
+          )
+        ],
       ),
-      body: drawerCheck ? myOrder() : myHome(isFavCheck),
+      body: myHome(isFavCheck),
     );
   }
 }

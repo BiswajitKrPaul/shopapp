@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/providers/orders.dart';
+import 'package:shopapp/widgets/maindrawer.dart';
 import 'package:shopapp/widgets/order_item_view.dart';
 
 class OrderHome extends StatelessWidget {
@@ -9,6 +10,10 @@ class OrderHome extends StatelessWidget {
   Widget build(BuildContext context) {
     final allOrders = Provider.of<Orders>(context);
     return Scaffold(
+      appBar: AppBar(
+        title: Text('My Orders'),
+      ),
+      drawer: MainDrawer(),
       body: ListView.builder(
         itemCount: allOrders.orders.length,
         itemBuilder: (ctx, index) {

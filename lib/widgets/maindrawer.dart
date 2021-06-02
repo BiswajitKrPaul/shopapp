@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shopapp/routes/manage_product.dart';
+import 'package:shopapp/routes/order_home.dart';
 
 class MainDrawer extends StatelessWidget {
-  final Function drawercheck;
-  MainDrawer(this.drawercheck);
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -22,20 +22,32 @@ class MainDrawer extends StatelessWidget {
           ),
         ),
         ListTile(
-          leading: Icon(Icons.shop),
+          leading: Icon(
+            Icons.shop,
+          ),
           title: Text('Home'),
           onTap: () {
-            drawercheck(false);
-            Navigator.pop(context);
+            Navigator.of(context).pushReplacementNamed('/');
           },
         ),
         Divider(),
         ListTile(
-          leading: Icon(Icons.payment),
+          leading: Icon(
+            Icons.payment,
+          ),
           title: Text('My Orders'),
           onTap: () {
-            drawercheck(true);
-            Navigator.pop(context);
+            Navigator.of(context).pushReplacementNamed(OrderHome.routeName);
+          },
+        ),
+        Divider(),
+        ListTile(
+          leading: Icon(
+            Icons.edit,
+          ),
+          title: Text('Manage Orders'),
+          onTap: () {
+            Navigator.of(context).pushReplacementNamed(ManageProduct.routeName);
           },
         ),
       ],
