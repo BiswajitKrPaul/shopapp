@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/providers/product_list_provider.dart';
+import 'package:shopapp/routes/add_edit_product.dart';
 import 'package:shopapp/widgets/maindrawer.dart';
 import 'package:shopapp/widgets/manage_order_item_view.dart';
 
@@ -18,7 +19,9 @@ class ManageProduct extends StatelessWidget {
             icon: Icon(
               Icons.add,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(AddEditProduct.routeName);
+            },
           ),
         ],
       ),
