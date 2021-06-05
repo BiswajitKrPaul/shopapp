@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shopapp/constants/consts.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/product.dart';
 
@@ -51,16 +55,33 @@ class ProductList with ChangeNotifier {
   }
 
   void addProduct(Product newProduct) {
-    Product tempP = Product(
-      id: DateTime.now().toString(),
-      description: newProduct.description,
-      imageUrl: newProduct.imageUrl,
-      price: newProduct.price,
-      title: newProduct.title,
-      isFaourite: false,
-    );
-    _productList.add(tempP);
-    notifyListeners();
+    Uri url = Uri.https(Constants.fireBaseUrl, Constants.productListNode);
+    http
+        .post(
+      url,
+      body: json.encode(
+        {
+          'Title': newProduct.title,
+          'Price': newProduct.price,
+          'Description': newProduct.description,
+          'imageUrl': newProduct.imageUrl,
+          'isFav': false,
+        },
+      ),
+    )
+        .then((response) {
+      print(response.body);
+      Product tempP = Product(
+        id: json.decode(response.body)['name'],
+        description: newProduct.description,
+        imageUrl: newProduct.imageUrl,
+        price: newProduct.price,
+        title: newProduct.title,
+        isFaourite: false,
+      );
+      _productList.add(tempP);
+      notifyListeners();
+    });
   }
 
   void removeProduct(Product newProduct) {
