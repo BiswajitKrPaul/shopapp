@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopapp/models/product.dart';
+import 'package:shopapp/providers/product_list_provider.dart';
 import 'package:shopapp/routes/add_edit_product.dart';
 
 class ManageOrderItemView extends StatelessWidget {
@@ -33,7 +35,10 @@ class ManageOrderItemView extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.delete),
-                onPressed: () {},
+                onPressed: () {
+                  Provider.of<ProductList>(context, listen: false)
+                      .removeProduct(_product);
+                },
                 color: Theme.of(context).errorColor,
               ),
             ],

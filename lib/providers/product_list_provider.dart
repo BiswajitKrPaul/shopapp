@@ -63,6 +63,11 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeProduct(Product newProduct) {
+    _productList.remove(newProduct);
+    notifyListeners();
+  }
+
   void updateProduct(Product newProduct) {
     int index = _productList.indexOf(
         _productList.firstWhere((element) => newProduct.id == element.id));
