@@ -51,7 +51,24 @@ class ProductList with ChangeNotifier {
   }
 
   void addProduct(Product newProduct) {
-    _productList.add(newProduct);
+    Product tempP = Product(
+      id: DateTime.now().toString(),
+      description: newProduct.description,
+      imageUrl: newProduct.imageUrl,
+      price: newProduct.price,
+      title: newProduct.title,
+      isFaourite: false,
+    );
+    _productList.add(tempP);
+    notifyListeners();
+  }
+
+  void updateProduct(Product newProduct) {
+    int index = _productList.indexOf(
+        _productList.firstWhere((element) => newProduct.id == element.id));
+    if (index >= 0) {
+      _productList[index] = newProduct;
+    }
     notifyListeners();
   }
 

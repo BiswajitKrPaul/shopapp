@@ -32,6 +32,23 @@ class _AddEditProductState extends State<AddEditProduct> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Product product = ModalRoute.of(context).settings.arguments;
+    if (product != null) {
+      newProduct = Product(
+        id: product.id,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        title: product.title,
+        isFaourite: product.isFaourite,
+      );
+      _imageUrlController.text = product.imageUrl;
+    }
+  }
+
+  @override
   void dispose() {
     _imageFocus.removeListener(updateImage);
     _priceFocusNode.dispose();
@@ -50,8 +67,18 @@ class _AddEditProductState extends State<AddEditProduct> {
   void _saveForm() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      newProduct.setFav();
-      Provider.of<ProductList>(context, listen: false).addProduct(newProduct);
+      if (newProduct.id != null) {
+        Provider.of<ProductList>(
+          context,
+          listen: false,
+        ).updateProduct(newProduct);
+      } else {
+        Provider.of<ProductList>(
+          context,
+          listen: false,
+        ).addProduct(newProduct);
+      }
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Product Saved'),
@@ -80,6 +107,7 @@ class _AddEditProductState extends State<AddEditProduct> {
             child: Column(
               children: [
                 TextFormField(
+                  initialValue: newProduct.title,
                   decoration: InputDecoration(
                     labelText: 'Title',
                   ),
@@ -90,11 +118,12 @@ class _AddEditProductState extends State<AddEditProduct> {
                       FocusScope.of(context).requestFocus(_priceFocusNode),
                   onSaved: (value) {
                     newProduct = Product(
-                      id: null,
                       description: newProduct.description,
                       imageUrl: newProduct.imageUrl,
                       price: newProduct.price,
                       title: value,
+                      id: newProduct.id,
+                      isFaourite: newProduct.isFaourite,
                     );
                   },
                   validator: (value) {
@@ -105,6 +134,9 @@ class _AddEditProductState extends State<AddEditProduct> {
                   },
                 ),
                 TextFormField(
+                  initialValue: newProduct.price == 0.0
+                      ? ''
+                      : newProduct.price.toString(),
                   decoration: InputDecoration(
                     labelText: 'Price',
                   ),
@@ -115,11 +147,12 @@ class _AddEditProductState extends State<AddEditProduct> {
                       .requestFocus(_descriptionFocusNode),
                   onSaved: (value) {
                     newProduct = Product(
-                      id: null,
                       description: newProduct.description,
                       imageUrl: newProduct.imageUrl,
                       price: double.parse(value),
                       title: newProduct.title,
+                      id: newProduct.id,
+                      isFaourite: newProduct.isFaourite,
                     );
                   },
                   validator: (value) {
@@ -136,6 +169,7 @@ class _AddEditProductState extends State<AddEditProduct> {
                   },
                 ),
                 TextFormField(
+                  initialValue: newProduct.description,
                   decoration: InputDecoration(
                     labelText: 'Description',
                   ),
@@ -144,11 +178,12 @@ class _AddEditProductState extends State<AddEditProduct> {
                   keyboardType: TextInputType.multiline,
                   onSaved: (value) {
                     newProduct = Product(
-                      id: null,
                       description: value,
                       imageUrl: newProduct.imageUrl,
                       price: newProduct.price,
                       title: newProduct.title,
+                      id: newProduct.id,
+                      isFaourite: newProduct.isFaourite,
                     );
                   },
                   validator: (value) {
@@ -196,12 +231,12 @@ class _AddEditProductState extends State<AddEditProduct> {
                         onFieldSubmitted: (val) => _saveForm(),
                         onSaved: (value) {
                           newProduct = Product(
-                            id: DateTime.now().toString(),
                             description: newProduct.description,
                             imageUrl: value,
                             price: newProduct.price,
                             title: newProduct.title,
-                            isFaourite: false,
+                            id: newProduct.id,
+                            isFaourite: newProduct.isFaourite,
                           );
                         },
                       ),

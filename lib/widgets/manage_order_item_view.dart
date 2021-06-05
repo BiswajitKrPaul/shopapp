@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopapp/models/product.dart';
+import 'package:shopapp/routes/add_edit_product.dart';
 
 class ManageOrderItemView extends StatelessWidget {
   final Product _product;
@@ -24,7 +25,10 @@ class ManageOrderItemView extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(Icons.edit),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushNamed(AddEditProduct.routeName, arguments: _product);
+                },
                 color: Theme.of(context).primaryColor,
               ),
               IconButton(
