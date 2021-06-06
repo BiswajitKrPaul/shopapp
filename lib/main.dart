@@ -44,6 +44,10 @@ class MyApp extends StatelessWidget {
                     color: Colors.white,
                     fontSize: 12.0,
                     fontWeight: FontWeight.bold),
+                headline2: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.bold),
               ),
         ),
         home: ProductOverview(),

@@ -54,23 +54,21 @@ class ProductList with ChangeNotifier {
     return _productList.where((element) => element.isFaourite).toList();
   }
 
-  void addProduct(Product newProduct) {
+  Future<void> addProduct(Product newProduct) async {
     Uri url = Uri.https(Constants.fireBaseUrl, Constants.productListNode);
-    http
-        .post(
-      url,
-      body: json.encode(
-        {
-          'Title': newProduct.title,
-          'Price': newProduct.price,
-          'Description': newProduct.description,
-          'imageUrl': newProduct.imageUrl,
-          'isFav': false,
-        },
-      ),
-    )
-        .then((response) {
-      print(response.body);
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'Title': newProduct.title,
+            'Price': newProduct.price,
+            'Description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'isFav': false,
+          },
+        ),
+      );
       Product tempP = Product(
         id: json.decode(response.body)['name'],
         description: newProduct.description,
@@ -81,7 +79,9 @@ class ProductList with ChangeNotifier {
       );
       _productList.add(tempP);
       notifyListeners();
-    });
+    } catch (error) {
+      throw error;
+    }
   }
 
   void removeProduct(Product newProduct) {
