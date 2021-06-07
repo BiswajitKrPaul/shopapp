@@ -31,7 +31,7 @@ class Product with ChangeNotifier {
         url,
         body: json.encode(
           {
-            'isFav': !isFaourite,
+            'isFav': isFaourite,
           },
         ),
       );

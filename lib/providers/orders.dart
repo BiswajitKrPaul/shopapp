@@ -20,7 +20,7 @@ class Orders with ChangeNotifier {
   var uuid = Uuid();
 
   List<OrderItem> get orders {
-    return [..._orders];
+    return [..._orders.reversed];
   }
 
   Future<void> fetchOrders() async {

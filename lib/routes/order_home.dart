@@ -4,53 +4,42 @@ import 'package:shopapp/providers/orders.dart';
 import 'package:shopapp/widgets/maindrawer.dart';
 import 'package:shopapp/widgets/order_item_view.dart';
 
-class OrderHome extends StatefulWidget {
+class OrderHome extends StatelessWidget {
   static const routeName = 'OrderHome';
 
   @override
-  _OrderHomeState createState() => _OrderHomeState();
-}
-
-class _OrderHomeState extends State<OrderHome> {
-  bool isLoading = false;
-  bool isInit = true;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (isInit) {
-      setState(() {
-        isLoading = true;
-      });
-      Provider.of<Orders>(context).fetchOrders().then((_) {
-        setState(() {
-          isLoading = false;
-        });
-      });
-      isInit = false;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final allOrders = Provider.of<Orders>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('My Orders'),
       ),
       drawer: MainDrawer(),
-      body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: allOrders.orders.length,
-              itemBuilder: (ctx, index) {
-                return OrderItemView(
-                  orderData: allOrders.orders[index],
-                  index: index,
+      body: FutureBuilder(
+        future: Provider.of<Orders>(context, listen: false).fetchOrders(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('An Error Occured!!!'),
+              );
+            } else {
+              return Consumer<Orders>(builder: (ctx, allOrders, child) {
+                return ListView.builder(
+                  itemCount: allOrders.orders.length,
+                  itemBuilder: (ctx, index) {
+                    return OrderItemView(
+                      orderData: allOrders.orders[index],
+                      index: index,
+                    );
+                  },
                 );
-              },
-            ),
+              });
+            }
+          }
+        },
+      ),
     );
   }
 }
