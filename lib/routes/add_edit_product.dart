@@ -72,11 +72,17 @@ class _AddEditProductState extends State<AddEditProduct> {
         isLoading = true;
       });
       if (newProduct.id != null) {
-        Provider.of<ProductList>(
+        await Provider.of<ProductList>(
           context,
           listen: false,
-        ).updateProduct(newProduct);
-        Navigator.of(context).pop();
+        ).updateProduct(newProduct).then((value) {
+          setState(
+            () {
+              isLoading = false;
+            },
+          );
+          Navigator.of(context).pop();
+        });
       } else {
         try {
           await Provider.of<ProductList>(

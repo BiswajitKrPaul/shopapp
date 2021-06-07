@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/models/product.dart';
+import 'package:toast/toast.dart';
 import '../providers/cart.dart';
 
 import 'package:shopapp/routes/product_detail.dart';
@@ -33,8 +34,13 @@ class ProductItem extends StatelessWidget {
             builder: (ctx, pro, child) => IconButton(
               icon:
                   Icon(pro.isFaourite ? Icons.favorite : Icons.favorite_border),
-              onPressed: () {
-                pro.setFav();
+              onPressed: () async {
+                try {
+                  await pro.setFav();
+                } catch (error) {
+                  Toast.show('Unable to Update Favourite Status', ctx,
+                      duration: Toast.LENGTH_SHORT);
+                }
               },
             ),
           ),

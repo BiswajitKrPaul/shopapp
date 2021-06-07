@@ -28,7 +28,8 @@ class _OrderItemViewState extends State<OrderItemView> {
               DateFormat('dd/MM/yyyy hh:mm')
                   .format(widget.orderData.orderDateTime),
             ),
-            subtitle: Text('Total Amount : \$${widget.orderData.amount}'),
+            subtitle: Text(
+                'Total Amount : \$${widget.orderData.amount.toStringAsFixed(2)}'),
             initiallyExpanded: isExpanded,
             onExpansionChanged: (val) {
               setState(() {

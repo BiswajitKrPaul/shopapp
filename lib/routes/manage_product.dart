@@ -7,6 +7,10 @@ import 'package:shopapp/widgets/manage_order_item_view.dart';
 
 class ManageProduct extends StatelessWidget {
   static const String routeName = 'manageProduct';
+  Future<void> refreshProd(BuildContext context) async {
+    await Provider.of<ProductList>(context, listen: false).fetchProduct();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,16 +30,19 @@ class ManageProduct extends StatelessWidget {
         ],
       ),
       drawer: MainDrawer(),
-      body: Padding(
-        padding: EdgeInsets.all(8),
-        child: Consumer<ProductList>(builder: (ctx, proList, child) {
-          return ListView.builder(
-            itemBuilder: (ctx, index) {
-              return ManageOrderItemView(proList.productlist[index]);
-            },
-            itemCount: proList.productlist.length,
-          );
-        }),
+      body: RefreshIndicator(
+        onRefresh: () => refreshProd(context),
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: Consumer<ProductList>(builder: (ctx, proList, child) {
+            return ListView.builder(
+              itemBuilder: (ctx, index) {
+                return ManageOrderItemView(proList.productlist[index]);
+              },
+              itemCount: proList.productlist.length,
+            );
+          }),
+        ),
       ),
     );
   }

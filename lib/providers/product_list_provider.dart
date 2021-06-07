@@ -7,44 +7,7 @@ import 'package:http/http.dart' as http;
 import '../models/product.dart';
 
 class ProductList with ChangeNotifier {
-  List<Product> _productList = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-      isFaourite: false,
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-      isFaourite: false,
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-      isFaourite: false,
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-      isFaourite: false,
-    ),
-  ];
+  List<Product> _productList = [];
 
   List<Product> get productlist {
     return [..._productList];
@@ -52,6 +15,31 @@ class ProductList with ChangeNotifier {
 
   List<Product> get favouriteProductList {
     return _productList.where((element) => element.isFaourite).toList();
+  }
+
+  Future<void> fetchProduct() async {
+    Uri uri = Uri.https(Constants.fireBaseUrl, Constants.productListNode);
+    try {
+      final response = await http.get(uri);
+      final extractedResponse =
+          json.decode(response.body) as Map<String, dynamic>;
+      List<Product> tempP = [];
+      extractedResponse.forEach((key, value) {
+        tempP.add(
+          Product(
+              id: key,
+              description: value['Description'],
+              imageUrl: value['imageUrl'],
+              price: value['Price'],
+              title: value['Title'],
+              isFaourite: value['isFav']),
+        );
+      });
+      _productList = tempP;
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> addProduct(Product newProduct) async {
@@ -84,18 +72,38 @@ class ProductList with ChangeNotifier {
     }
   }
 
-  void removeProduct(Product newProduct) {
-    _productList.remove(newProduct);
-    notifyListeners();
+  Future<void> removeProduct(Product newProduct) async {
+    Uri url =
+        Uri.https(Constants.fireBaseUrl, '/product/${newProduct.id}.json');
+    final respose = await http.delete(url);
+    if (respose.statusCode >= 400) {
+      throw Exception('Deletion Failed');
+    } else {
+      _productList.remove(newProduct);
+      notifyListeners();
+    }
   }
 
-  void updateProduct(Product newProduct) {
+  Future<void> updateProduct(Product newProduct) async {
     int index = _productList.indexOf(
         _productList.firstWhere((element) => newProduct.id == element.id));
     if (index >= 0) {
+      Uri url =
+          Uri.https(Constants.fireBaseUrl, '/product/${newProduct.id}.json');
+      await http.patch(
+        url,
+        body: json.encode(
+          {
+            'Title': newProduct.title,
+            'Price': newProduct.price,
+            'Description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+          },
+        ),
+      );
       _productList[index] = newProduct;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   Product getProductFromId(String id) {

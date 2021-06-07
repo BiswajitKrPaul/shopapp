@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/providers/cart.dart';
 import 'package:shopapp/providers/orders.dart';
+import 'package:toast/toast.dart';
 import '../widgets/cart_item_view.dart';
 
 class CartHome extends StatelessWidget {
@@ -39,20 +40,7 @@ class CartHome extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                          cartItems.items.values.toList(),
-                          cartItems.totalAmount);
-                      cartItems.removeAllFromCart();
-                    },
-                    child: Text(
-                      'Order Now',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
+                  OrderButton(cartItems: cartItems),
                 ],
               ),
             ),
@@ -74,5 +62,54 @@ class CartHome extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required this.cartItems,
+  }) : super(key: key);
+
+  final Cart cartItems;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  bool isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return isLoading
+        ? Center(
+            child: const CircularProgressIndicator(),
+          )
+        : TextButton(
+            onPressed: widget.cartItems.totalAmount <= 0
+                ? null
+                : () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    try {
+                      await Provider.of<Orders>(context, listen: false)
+                          .addOrder(widget.cartItems.items.values.toList(),
+                              widget.cartItems.totalAmount);
+                      setState(() {
+                        isLoading = false;
+                      });
+                      widget.cartItems.removeAllFromCart();
+                    } catch (error) {
+                      Toast.show('Unable to place the order', context);
+                    }
+                  },
+            child: Text(
+              'Order Now',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          );
   }
 }

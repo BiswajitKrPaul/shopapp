@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/providers/cart.dart';
+import 'package:shopapp/providers/product_list_provider.dart';
 import 'package:shopapp/routes/cart_home.dart';
 import 'package:shopapp/routes/order_home.dart';
 import 'package:shopapp/widgets/maindrawer.dart';
@@ -20,6 +21,8 @@ class ProductOverview extends StatefulWidget {
 
 class _ProductOverviewState extends State<ProductOverview> {
   bool isFavCheck = false;
+  bool isInit = true;
+  bool isLoading = false;
 
   Widget myHome(bool isFav) {
     return GridItemBuilder(isFav);
@@ -27,6 +30,23 @@ class _ProductOverviewState extends State<ProductOverview> {
 
   Widget myOrder() {
     return OrderHome();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (isInit) {
+      setState(() {
+        isLoading = true;
+      });
+      Provider.of<ProductList>(context).fetchProduct().then((_) {
+        setState(() {
+          isLoading = false;
+        });
+      });
+      isInit = false;
+    }
   }
 
   @override
@@ -82,7 +102,11 @@ class _ProductOverviewState extends State<ProductOverview> {
           )
         ],
       ),
-      body: myHome(isFavCheck),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : myHome(isFavCheck),
     );
   }
 }

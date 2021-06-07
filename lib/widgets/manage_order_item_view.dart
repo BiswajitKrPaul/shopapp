@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopapp/models/product.dart';
 import 'package:shopapp/providers/product_list_provider.dart';
 import 'package:shopapp/routes/add_edit_product.dart';
+import 'package:toast/toast.dart';
 
 class ManageOrderItemView extends StatelessWidget {
   final Product _product;
@@ -35,9 +36,14 @@ class ManageOrderItemView extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.delete),
-                onPressed: () {
-                  Provider.of<ProductList>(context, listen: false)
-                      .removeProduct(_product);
+                onPressed: () async {
+                  try {
+                    await Provider.of<ProductList>(context, listen: false)
+                        .removeProduct(_product);
+                  } catch (error) {
+                    Toast.show(error.toString().split(':')[1], context,
+                        duration: Toast.LENGTH_SHORT);
+                  }
                 },
                 color: Theme.of(context).errorColor,
               ),

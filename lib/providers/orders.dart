@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:shopapp/constants/consts.dart';
 import 'package:shopapp/providers/cart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -19,13 +23,65 @@ class Orders with ChangeNotifier {
     return [..._orders];
   }
 
-  void addOrder(List<CartItem> cartItem, double totalAmount) {
+  Future<void> fetchOrders() async {
+    Uri url = Uri.https(Constants.fireBaseUrl, Constants.orderListNode);
+    final response = await http.get(url);
+    List<OrderItem> temP = [];
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData != null) {
+      extractedData.forEach(
+        (key, value) {
+          temP.add(
+            OrderItem(
+              id: key,
+              amount: value['amount'],
+              orderDateTime: DateTime.parse(value['orderDateTime']),
+              products: (value['products'] as List<dynamic>)
+                  .map(
+                    (e) => CartItem(
+                        id: e['id'],
+                        price: e['price'],
+                        quantity: e['quantity'],
+                        title: e['title']),
+                  )
+                  .toList(),
+            ),
+          );
+        },
+      );
+      _orders = temP;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addOrder(List<CartItem> cartItem, double totalAmount) async {
+    var orderDate = DateTime.now();
+    Uri url = Uri.https(Constants.fireBaseUrl, Constants.orderListNode);
+    final response = await http.post(
+      url,
+      body: json.encode(
+        {
+          'amount': totalAmount,
+          'orderDateTime': orderDate.toIso8601String(),
+          'products': cartItem
+              .map(
+                (e) => {
+                  'id': e.id,
+                  'price': e.price,
+                  'quantity': e.quantity,
+                  'title': e.title
+                },
+              )
+              .toList()
+        },
+      ),
+    );
     _orders.add(
       OrderItem(
-        id: uuid.v4(),
+        id: json.decode(response.body)['name'],
         amount: totalAmount,
         products: cartItem,
-        orderDateTime: DateTime.now(),
+        orderDateTime: orderDate,
       ),
     );
     notifyListeners();
