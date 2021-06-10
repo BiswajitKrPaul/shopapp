@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shopapp/constants/consts.dart';
 import 'package:shopapp/providers/cart.dart';
-import 'package:uuid/uuid.dart';
 
 class OrderItem {
   final String id;
@@ -17,7 +16,6 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
-  var uuid = Uuid();
 
   List<OrderItem> get orders {
     return [..._orders.reversed];

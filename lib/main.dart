@@ -4,11 +4,13 @@ import 'package:shopapp/providers/cart.dart';
 import 'package:shopapp/providers/orders.dart';
 import 'package:shopapp/providers/product_list_provider.dart';
 import 'package:shopapp/routes/add_edit_product.dart';
+import 'package:shopapp/routes/auth_screen.dart';
 import 'package:shopapp/routes/cart_home.dart';
 import 'package:shopapp/routes/manage_product.dart';
 import 'package:shopapp/routes/order_home.dart';
+import 'package:shopapp/routes/product_overview.dart';
 import './routes/product_detail.dart';
-import './routes/product_overview.dart';
+import './providers/auth.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,6 +30,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (ctx) => Orders(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => Auth(),
         ),
       ],
       child: MaterialApp(
@@ -50,13 +55,14 @@ class MyApp extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
         ),
-        home: ProductOverview(),
+        home: AuthScreen(),
         routes: {
           ProductDetail.routeName: (ctx) => ProductDetail(),
           CartHome.routeName: (ctx) => CartHome(),
           OrderHome.routeName: (ctx) => OrderHome(),
           ManageProduct.routeName: (ctx) => ManageProduct(),
           AddEditProduct.routeName: (ctx) => AddEditProduct(),
+          ProductOverview.routeName: (ctx) => ProductOverview(),
         },
       ),
     );

@@ -15,6 +15,7 @@ enum FilteredOptions {
 }
 
 class ProductOverview extends StatefulWidget {
+  static const String routeName = "/ProductOverView";
   @override
   _ProductOverviewState createState() => _ProductOverviewState();
 }
@@ -23,9 +24,14 @@ class _ProductOverviewState extends State<ProductOverview> {
   bool isFavCheck = false;
   bool isInit = true;
   bool isLoading = false;
+  bool isError = false;
 
   Widget myHome(bool isFav) {
-    return GridItemBuilder(isFav);
+    return isError
+        ? Center(
+            child: Text('An Error Occured!!!'),
+          )
+        : GridItemBuilder(isFav);
   }
 
   Widget myOrder() {
@@ -40,11 +46,16 @@ class _ProductOverviewState extends State<ProductOverview> {
       setState(() {
         isLoading = true;
       });
-      Provider.of<ProductList>(context).fetchProduct().then((_) {
-        setState(() {
-          isLoading = false;
+      Provider.of<ProductList>(context).fetchProduct()
+        ..catchError((_) {
+          setState(() {
+            isError = true;
+          });
+        }).then((_) {
+          setState(() {
+            isLoading = false;
+          });
         });
-      });
       isInit = false;
     }
   }

@@ -29,7 +29,6 @@ dependencies:
   intl: ^0.17.0
   provider: ^5.0.0
   toast: ^0.1.5
-  uuid: ^3.0.4
 
 dev_dependencies:
   flutter_test:

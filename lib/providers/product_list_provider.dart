@@ -38,7 +38,7 @@ class ProductList with ChangeNotifier {
       _productList = tempP;
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw Exception('Error');
     }
   }
 
