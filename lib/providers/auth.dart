@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shopapp/constants/consts.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopapp/models/http_exceptions.dart';
 
 class Auth with ChangeNotifier {
   String _token;
@@ -22,7 +23,21 @@ class Auth with ChangeNotifier {
           },
         ),
       );
-      print(json.decode(response.body));
+      if (response.statusCode >= 400) {
+        throw HttpException(json.decode(response.body)['error']['message']);
+      } else {
+        final extractedData = json.decode(response.body);
+        _token = extractedData['idToken'];
+        _expireTokenDate = DateTime.now().add(
+          Duration(
+            seconds: int.parse(
+              extractedData['expiresIn'],
+            ),
+          ),
+        );
+        _userID = extractedData['localId'];
+        notifyListeners();
+      }
     } catch (error) {
       throw error;
     }
@@ -42,16 +57,38 @@ class Auth with ChangeNotifier {
         ),
       );
       if (response.statusCode >= 400) {
-        throw Exception('Issue while SignUp');
+        throw HttpException(json.decode(response.body)['error']['message']);
       } else {
         final extractedData = json.decode(response.body);
-
         _token = extractedData['idToken'];
-        _expireTokenDate = extractedData['expiresIn'];
+        _expireTokenDate = DateTime.now().add(
+          Duration(
+            seconds: int.parse(
+              extractedData['expiresIn'],
+            ),
+          ),
+        );
         _userID = extractedData['localId'];
       }
     } catch (error) {
-      throw Exception(error);
+      throw error;
     }
+  }
+
+  bool get isAuth {
+    return token != null;
+  }
+
+  String get user {
+    return _userID;
+  }
+
+  String get token {
+    if (_expireTokenDate != null &&
+        _token != null &&
+        _expireTokenDate.isAfter(DateTime.now())) {
+      return _token;
+    }
+    return null;
   }
 }

@@ -16,13 +16,15 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  String token;
 
   List<OrderItem> get orders {
     return [..._orders.reversed];
   }
 
   Future<void> fetchOrders() async {
-    Uri url = Uri.https(Constants.fireBaseUrl, Constants.orderListNode);
+    Uri url = Uri.parse(
+        '${Constants.fireBaseUrl}${Constants.orderListNode}?auth=$token');
     final response = await http.get(url);
     List<OrderItem> temP = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -54,7 +56,8 @@ class Orders with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartItem, double totalAmount) async {
     var orderDate = DateTime.now();
-    Uri url = Uri.https(Constants.fireBaseUrl, Constants.orderListNode);
+    Uri url = Uri.parse(
+        '${Constants.fireBaseUrl}${Constants.orderListNode}?auth=$token');
     final response = await http.post(
       url,
       body: json.encode(

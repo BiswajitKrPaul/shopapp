@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/models/product.dart';
+import 'package:shopapp/providers/auth.dart';
 import 'package:toast/toast.dart';
 import '../providers/cart.dart';
 
@@ -10,6 +11,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(
         10,
@@ -36,7 +38,7 @@ class ProductItem extends StatelessWidget {
                   Icon(pro.isFaourite ? Icons.favorite : Icons.favorite_border),
               onPressed: () async {
                 try {
-                  await pro.setFav();
+                  await pro.setFav(authData.token, authData.user);
                 } catch (error) {
                   Toast.show('Unable to Update Favourite Status', ctx,
                       duration: Toast.LENGTH_SHORT);

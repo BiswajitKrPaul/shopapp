@@ -21,18 +21,17 @@ class Product with ChangeNotifier {
     @required this.title,
   });
 
-  Future<void> setFav() async {
-    Uri url = Uri.https(Constants.fireBaseUrl, '/product/$id.json');
+  Future<void> setFav(String token, String userID) async {
+    Uri url = Uri.parse(
+        '${Constants.fireBaseUrl}/userFav/$userID/$id.json?auth=$token');
     bool oldValue = isFaourite;
     isFaourite = !isFaourite;
     notifyListeners();
     try {
-      final response = await http.patch(
+      final response = await http.put(
         url,
         body: json.encode(
-          {
-            'isFav': isFaourite,
-          },
+          isFaourite,
         ),
       );
       if (response.statusCode >= 400) {

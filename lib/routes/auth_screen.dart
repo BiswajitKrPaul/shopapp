@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopapp/providers/auth.dart';
+import 'package:toast/toast.dart';
+import '../models/http_exceptions.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -105,26 +107,44 @@ class _AuthCardState extends State<AuthCard> {
   final _passwordController = TextEditingController();
 
   void _submit() async {
-    if (!_formKey.currentState.validate()) {
-      // Invalid!
-      return;
-    }
-    _formKey.currentState.save();
-    setState(() {
-      _isLoading = true;
-    });
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-      await Provider.of<Auth>(context, listen: false)
-          .logIn(_authData['email'], _authData['password']);
-    } else {
-      // Sign user up
-      await Provider.of<Auth>(context, listen: false)
-          .signUp(_authData['email'], _authData['password']);
+    try {
+      if (!_formKey.currentState.validate()) {
+        // Invalid!
+        return;
+      }
+      _formKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      if (_authMode == AuthMode.Login) {
+        // Log user in
+        await Provider.of<Auth>(context, listen: false)
+            .logIn(_authData['email'], _authData['password']);
+      } else {
+        // Sign user up
+        await Provider.of<Auth>(context, listen: false)
+            .signUp(_authData['email'], _authData['password']);
+      }
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication Failed';
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'The email address is already in use by another account';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'The email address is not registered';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'The password is invalid';
+      }
+      _showToast(errorMessage);
+    } catch (error) {
+      _showToast('Authentication Failed');
     }
     setState(() {
       _isLoading = false;
     });
+  }
+
+  void _showToast(String msg) {
+    Toast.show(msg, context, duration: Toast.LENGTH_SHORT);
   }
 
   void _switchAuthMode() {

@@ -23,47 +23,52 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (ctx) => Auth(),
+        ),
+        ChangeNotifierProxyProvider<Auth, ProductList>(
           create: (ctx) => ProductList(),
+          update: (ctx, authData, previousProductList) =>
+              previousProductList..authData = authData,
         ),
         ChangeNotifierProvider(
           create: (ctx) => Cart(),
         ),
-        ChangeNotifierProvider(
+        ChangeNotifierProxyProvider<Auth, Orders>(
           create: (ctx) => Orders(),
-        ),
-        ChangeNotifierProvider(
-          create: (ctx) => Auth(),
+          update: (ctx, auth, orders) => orders..token = auth.token,
         ),
       ],
-      child: MaterialApp(
-        title: 'Shop App',
-        theme: ThemeData(
-          primarySwatch: Colors.indigo,
-          accentColor: Colors.green[400],
-          textTheme: ThemeData.light().textTheme.copyWith(
-                headline6: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold),
-                headline1: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.bold),
-                headline2: TextStyle(
-                    color: Colors.black,
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.bold),
-              ),
+      child: Consumer<Auth>(
+        builder: (ctx, auth, child) => MaterialApp(
+          title: 'Shop App',
+          theme: ThemeData(
+            primarySwatch: Colors.indigo,
+            accentColor: Colors.green[400],
+            textTheme: ThemeData.light().textTheme.copyWith(
+                  headline6: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold),
+                  headline1: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.bold),
+                  headline2: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.bold),
+                ),
+          ),
+          home: auth.isAuth ? ProductOverview() : AuthScreen(),
+          routes: {
+            ProductDetail.routeName: (ctx) => ProductDetail(),
+            CartHome.routeName: (ctx) => CartHome(),
+            OrderHome.routeName: (ctx) => OrderHome(),
+            ManageProduct.routeName: (ctx) => ManageProduct(),
+            AddEditProduct.routeName: (ctx) => AddEditProduct(),
+            ProductOverview.routeName: (ctx) => ProductOverview(),
+          },
         ),
-        home: AuthScreen(),
-        routes: {
-          ProductDetail.routeName: (ctx) => ProductDetail(),
-          CartHome.routeName: (ctx) => CartHome(),
-          OrderHome.routeName: (ctx) => OrderHome(),
-          ManageProduct.routeName: (ctx) => ManageProduct(),
-          AddEditProduct.routeName: (ctx) => AddEditProduct(),
-          ProductOverview.routeName: (ctx) => ProductOverview(),
-        },
       ),
     );
   }

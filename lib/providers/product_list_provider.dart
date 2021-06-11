@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shopapp/constants/consts.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopapp/providers/auth.dart';
 
 import '../models/product.dart';
 
 class ProductList with ChangeNotifier {
   List<Product> _productList = [];
+  Auth authData;
 
   List<Product> get productlist {
     return [..._productList];
@@ -18,11 +20,17 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> fetchProduct() async {
-    Uri uri = Uri.https(Constants.fireBaseUrl, Constants.productListNode);
+    Uri uri = Uri.parse(
+        '${Constants.fireBaseUrl}${Constants.productListNode}?auth=${authData.token}');
     try {
       final response = await http.get(uri);
       final extractedResponse =
           json.decode(response.body) as Map<String, dynamic>;
+      uri = Uri.parse(
+          '${Constants.fireBaseUrl}/userFav/${authData.user}.json?auth=${authData.token}');
+      final favResponse = await http.get(uri);
+      final extractedFav = json.decode(favResponse.body);
+      print(extractedFav);
       List<Product> tempP = [];
       extractedResponse.forEach((key, value) {
         tempP.add(
@@ -32,7 +40,8 @@ class ProductList with ChangeNotifier {
               imageUrl: value['imageUrl'],
               price: value['Price'],
               title: value['Title'],
-              isFaourite: value['isFav']),
+              isFaourite:
+                  extractedFav == null ? false : extractedFav[key] ?? false),
         );
       });
       _productList = tempP;
@@ -43,7 +52,8 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> addProduct(Product newProduct) async {
-    Uri url = Uri.https(Constants.fireBaseUrl, Constants.productListNode);
+    Uri url = Uri.parse(
+        '${Constants.fireBaseUrl}${Constants.productListNode}?auth=${authData.token}');
     try {
       final response = await http.post(
         url,
@@ -53,7 +63,6 @@ class ProductList with ChangeNotifier {
             'Price': newProduct.price,
             'Description': newProduct.description,
             'imageUrl': newProduct.imageUrl,
-            'isFav': false,
           },
         ),
       );
@@ -63,7 +72,6 @@ class ProductList with ChangeNotifier {
         imageUrl: newProduct.imageUrl,
         price: newProduct.price,
         title: newProduct.title,
-        isFaourite: false,
       );
       _productList.add(tempP);
       notifyListeners();
@@ -73,8 +81,8 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> removeProduct(Product newProduct) async {
-    Uri url =
-        Uri.https(Constants.fireBaseUrl, '/product/${newProduct.id}.json');
+    Uri url = Uri.parse(
+        '${Constants.fireBaseUrl}/product/${newProduct.id}.json?auth=${authData.token}');
     final respose = await http.delete(url);
     if (respose.statusCode >= 400) {
       throw Exception('Deletion Failed');
@@ -88,8 +96,8 @@ class ProductList with ChangeNotifier {
     int index = _productList.indexOf(
         _productList.firstWhere((element) => newProduct.id == element.id));
     if (index >= 0) {
-      Uri url =
-          Uri.https(Constants.fireBaseUrl, '/product/${newProduct.id}.json');
+      Uri url = Uri.parse(
+          '${Constants.fireBaseUrl}/product/${newProduct.id}.json?auth=${authData.token}');
       await http.patch(
         url,
         body: json.encode(
