@@ -46,7 +46,7 @@ class _ProductOverviewState extends State<ProductOverview> {
       setState(() {
         isLoading = true;
       });
-      Provider.of<ProductList>(context).fetchProduct()
+      Provider.of<ProductList>(context).fetchProduct(true)
         ..catchError((_) {
           setState(() {
             isError = true;

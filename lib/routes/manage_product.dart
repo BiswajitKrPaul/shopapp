@@ -8,7 +8,7 @@ import 'package:shopapp/widgets/manage_order_item_view.dart';
 class ManageProduct extends StatelessWidget {
   static const String routeName = 'manageProduct';
   Future<void> refreshProd(BuildContext context) async {
-    await Provider.of<ProductList>(context, listen: false).fetchProduct();
+    await Provider.of<ProductList>(context, listen: false).fetchProduct(false);
   }
 
   @override
@@ -34,14 +34,30 @@ class ManageProduct extends StatelessWidget {
         onRefresh: () => refreshProd(context),
         child: Padding(
           padding: EdgeInsets.all(8),
-          child: Consumer<ProductList>(builder: (ctx, proList, child) {
-            return ListView.builder(
-              itemBuilder: (ctx, index) {
-                return ManageOrderItemView(proList.productlist[index]);
-              },
-              itemCount: proList.productlist.length,
-            );
-          }),
+          child: FutureBuilder(
+            future: Provider.of<ProductList>(context, listen: false)
+                .fetchProduct(false),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('An Error Occured!!!'),
+                  );
+                } else {
+                  return Consumer<ProductList>(builder: (ctx, proList, child) {
+                    return ListView.builder(
+                      itemBuilder: (ctx, index) {
+                        return ManageOrderItemView(proList.productlist[index]);
+                      },
+                      itemCount: proList.productlist.length,
+                    );
+                  });
+                }
+              }
+            },
+          ),
         ),
       ),
     );

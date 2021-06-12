@@ -9,6 +9,7 @@ import 'package:shopapp/routes/cart_home.dart';
 import 'package:shopapp/routes/manage_product.dart';
 import 'package:shopapp/routes/order_home.dart';
 import 'package:shopapp/routes/product_overview.dart';
+import 'package:shopapp/routes/splashscreen.dart';
 import './routes/product_detail.dart';
 import './providers/auth.dart';
 
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<Auth, Orders>(
           create: (ctx) => Orders(),
-          update: (ctx, auth, orders) => orders..token = auth.token,
+          update: (ctx, auth, orders) => orders..authData = auth,
         ),
       ],
       child: Consumer<Auth>(
@@ -59,7 +60,18 @@ class MyApp extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                 ),
           ),
-          home: auth.isAuth ? ProductOverview() : AuthScreen(),
+          home: auth.isAuth
+              ? ProductOverview()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return SplashScreen();
+                    } else {
+                      return AuthScreen();
+                    }
+                  },
+                ),
           routes: {
             ProductDetail.routeName: (ctx) => ProductDetail(),
             CartHome.routeName: (ctx) => CartHome(),

@@ -19,9 +19,15 @@ class ProductList with ChangeNotifier {
     return _productList.where((element) => element.isFaourite).toList();
   }
 
-  Future<void> fetchProduct() async {
-    Uri uri = Uri.parse(
-        '${Constants.fireBaseUrl}${Constants.productListNode}?auth=${authData.token}');
+  Future<void> fetchProduct(bool isHome) async {
+    Uri uri;
+    if (isHome) {
+      uri = Uri.parse(
+          '${Constants.fireBaseUrl}${Constants.productListNode}?auth=${authData.token}');
+    } else {
+      uri = Uri.parse(
+          '${Constants.fireBaseUrl}${Constants.productListNode}?auth=${authData.token}&orderBy="creatorId"&equalTo="${authData.user}"');
+    }
     try {
       final response = await http.get(uri);
       final extractedResponse =
@@ -63,6 +69,7 @@ class ProductList with ChangeNotifier {
             'Price': newProduct.price,
             'Description': newProduct.description,
             'imageUrl': newProduct.imageUrl,
+            'creatorId': authData.user,
           },
         ),
       );

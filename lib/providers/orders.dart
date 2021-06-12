@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:shopapp/constants/consts.dart';
+import 'package:shopapp/providers/auth.dart';
 import 'package:shopapp/providers/cart.dart';
 
 class OrderItem {
@@ -16,7 +17,7 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
-  String token;
+  Auth authData;
 
   List<OrderItem> get orders {
     return [..._orders.reversed];
@@ -24,7 +25,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchOrders() async {
     Uri url = Uri.parse(
-        '${Constants.fireBaseUrl}${Constants.orderListNode}?auth=$token');
+        '${Constants.fireBaseUrl}/orders/${authData.user}.json?auth=${authData.token}');
     final response = await http.get(url);
     List<OrderItem> temP = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -57,7 +58,7 @@ class Orders with ChangeNotifier {
   Future<void> addOrder(List<CartItem> cartItem, double totalAmount) async {
     var orderDate = DateTime.now();
     Uri url = Uri.parse(
-        '${Constants.fireBaseUrl}${Constants.orderListNode}?auth=$token');
+        '${Constants.fireBaseUrl}/orders/${authData.user}.json?auth=${authData.token}');
     final response = await http.post(
       url,
       body: json.encode(
