@@ -19,9 +19,12 @@ class ProductItem extends StatelessWidget {
       child: GridTile(
         child: InkWell(
           splashColor: Theme.of(context).primaryColor,
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
+          child: Hero(
+            tag: product.id,
+            child: Image.network(
+              product.imageUrl,
+              fit: BoxFit.cover,
+            ),
           ),
           onTap: () {
             Navigator.of(context).pushNamed(
